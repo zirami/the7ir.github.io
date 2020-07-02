@@ -1,7 +1,7 @@
 # --- Basic options --- #
 
 # Name of website
-title: Apra's Blog
+title: Apr4h.github.io
 
 # Short description of your site
 description: CTF Writeups and sometimes other stuff too
@@ -26,7 +26,7 @@ navbar-links:
 avatar: "/assets/img/3jd.png"
 
 # By default, the image is cut into a circle. You can disable this behaviour by setting 'round-avatar: false'
-round-avatar: true
+round-avatar: false
 
 # If you want to have an image logo in the top-left corner instead of the title text,
 # then specify the following parameter
@@ -81,15 +81,15 @@ excerpt_length: 50
 
 # Personalize the colors in your website. Colour values can be any valid CSS colour
 
-navbar-col: "#EF8354"
-navbar-text-col: "#4f5d75"
+navbar-col: "#e9c46a"
+navbar-text-col: "#2a9d8f"
 navbar-border-col: "#2d3142"
-page-col: "#FFFFFF"
+page-col: "#f1faee"
 link-col: "#bfc0c0"
 hover-col: "#ef8354"
-footer-col: "#ef8354"
-footer-text-col: "#4f5d75"
-footer-link-col: "#bfc0c0"
+footer-col: "#e9c46a"
+footer-text-col: "#2a9d8f"
+footer-link-col: "#2a9d8f"
 
 # Alternatively, the navbar, footer, and page background can be set to use background images
 # instead of colour
