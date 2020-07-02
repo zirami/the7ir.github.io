@@ -2,6 +2,7 @@
 title: Hack The Box - Arkham
 tags: [HTB, webapp exploit, nmap, smb, LUKS, ysoserial, java deserialisation exploit, python, PSRemoting, UAC Bypass, DLL Hijack]
 layout: post
+image: /assets/img/arkham/arkham_info.PNG
 ---                                                                  
 
 Arkham was definitely more difficult than its rating made it seem. In particular, the java deserialisation exploit required a fair bit of research and testing. The combination of UAC bypass / DLL hijack was a nice touch for the privesc. I refer to this post every now-and-then when I need to copy/paste code for writing/compiling a simple DLL :)
@@ -18,7 +19,7 @@ Arkham was definitely more difficult than its rating made it seem. In particular
   - Ez mode (root.txt only)
   - Hard Mode (UAC bypass via DLL hijack)
   
- ![Image](//assets/img/arkham/arkham_info.PNG) 
+ ![Image](/assets/img/arkham/arkham_info.PNG) 
   
 ---
 ## Port Scan
