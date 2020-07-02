@@ -1,8 +1,15 @@
 ---
-title: Hack The Box: Sniper
-tags: [Webapp Exploit, nmap, gobuster, Local File Inclusion, Remote File Inclusion, Firewall Evasion, SSH tunneling, Privilege Escalation, WinRM, Client-Side attack]
+title: Hack The Box - Sniper
+tags: [Webapp Exploit, nmap, gobuster, Local File Inclusion, Remote File Inclusion, Firewall Evasion, SSH tunneling, Privilege Escalation, WinRM, Client-Side attack, nishang]
 layout: post
 ---
+
+Sniper was a pretty fun machine that put an interesting spin on a couple of older attack techniques. Unlike some other machines that I've come across lately,
+its difficulty rating is pretty accurate. Overall, exploitation is fairly straightforward apart from a couple of interesting twists - for example having to
+serve RFI payloads via SMB, and the use of .chm files for client-side attacks. There are currently multiple active machines in the HTB labs that require client-side
+attacks at the moment. They're definitely an interesting vector but consistently emulating user behaviour can make the reliablility of exploitation janky in the HTB labs.
+This one wasn't too bad compared to others :)
+
 
 ## Summary
 ![Image](/assets/img/sniper/sniper_info.PNG)
@@ -13,12 +20,6 @@ layout: post
 - Firewall evasion (tunneling via SSH)
 - Privilege escalation via client-side attack (using nishang)
 
-Sniper was a pretty fun machine that put an interesting spin on a couple of older attack techniques. Unlike some other machines that I've come across lately,
-its difficulty rating is pretty accurate. Overall, exploitation is fairly straightforward apart from a couple of interesting twists - for example having to
-serve RFI payloads via SMB, and the use of .chm files for client-side attacks. There are currently multiple active machines in the HTB labs that require client-side
-attacks at the moment. They're definitely an interesting vector but consistently emulating user behaviour can make the reliablility of exploitation janky in the HTB labs.
-This one wasn't too bad compared to others :)
-  
 ---
 ## Port Scan
 `nmap -sC -sV -p- -v -o nmap-sniper.txt  10.10.10.151`
