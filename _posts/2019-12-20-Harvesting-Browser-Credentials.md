@@ -22,7 +22,7 @@ The artefacts of particular interest for credential gathering are the `Login Dat
 
 `Login Data` SQLite databases primarily exist to store the usernames and passwords you wish to store for auto-fill, but also store a bunch of metadata and information about how to submit your credentials to the correct URL. For simplicity, I only care about the db's `Logins` table - specifically the 'signon_realm', `username_value` and `password_value` columns of the table. In the image below I'm using SQLiteStudio to view the database which shows me that only the `password_value` gets encrypted. This value is encrypted using Microsoft's Data Protection API (DPAPI). 
 
-![Image](assets/img/browser-credentials/login_data_sqlite.PNG)
+![Image](/assets/img/browser-credentials/login_data_sqlite.PNG)
 
 The DPAPI was intended to be extremely simple to use, and consists of only two functions: **CryptProtectData()** and **CryptUnprotectData()** which symetrically encrypt/decrypt data "blobs" (arbitrary arrays of bytes) using implicit crypto keys tied to a specific user or system. The upside to DPAPI encrypted credentials is that I don't need to know any of the target user's passwords or keys in order to decrypt their creds if I am already executing code in that user's context. The downside is that some extra work needs to be done in order to decrypt credentials if I don't have code execution in the target user's context. [This awesome blog post](https://www.harmj0y.net/blog/redteaming/operational-guidance-for-offensive-user-dpapi-abuse/) shows Mimikatz "/unprotect"-ing DPAPI encrypted creds using a target user's known password.
 
@@ -139,13 +139,13 @@ ChromeLoginDataList.Add(loginData);
 ```
 
 Here's what it looks like when these are printed to the console:
-![Image](assets/img/browser-credentials/HBP_chrome_example.PNG)
+![Image](/assets/img/browser-credentials/HBP_chrome_example.PNG)
 
 # Mozilla Firefox
 
 As mentioned earlier, I relied heavily on research done by the developer of [firepwd](https://github.com/lclevy/firepwd) to understand how Mozilla deals with storage and encryption of credentials. This post references [this diagram](https://github.com/lclevy/firepwd/blob/master/mozilla_pbe.pdf) which is shown below. Firefox encrypts logins using [3DES](https://en.wikipedia.org/wiki/Triple_DES) in [CBC mode](http://cryptowiki.net/index.php?title=Cipher_Block_Chaining_(CBC)). The diagram shows Mozilla's master decryption key stored in **key3.db** (Berkley DB format) and encrypted logins stored in **signons.sqlite**. This was used in previous versions of Firefox and since version 58 logins are now stored in **key4.db** (SQLite) while encrypted logins are stored in **logins.json**. My tool only supports decryption of Firefox credentials from versions 58+.
 
-![Image](assets/img/browser-credentials/mozilla_pbe.PNG)
+![Image](/assets/img/browser-credentials/mozilla_pbe.PNG)
 
 Mozilla maintain their own cryptography libraries called [Network Security Services (NSS)](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS) which become important later, particularly due to its use of [ASN.1](https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One) for serialisation of data. One other big difference between Chrome and Firefox, is that Firefox allows users to supply a master password to encrypt all of their stored logins. HarvestBrowserPasswords can take a master password as a command-line argument and use it for decryption (assuming the password is known). If the user hasn't supplied a master password, the encryption key can be extracted from an SQLite database in the user's profile directory.
 
@@ -204,7 +204,7 @@ Based on this information, the steps for decrypting logins is as follows:
 HarvestBrowserPasswords locates Firefox profile directories/files and queries SQLite databases the same as it did for Chrome.
 
 This image shows the location of the [ASN.1 DER (Distinguished Encoding Rules)](https://docs.microsoft.com/en-us/windows/win32/seccertenroll/about-der-encoding-of-asn-1-types) encoded data which includes the 'password-check' value. The 'item1' value in the 'password' row contains the global salt value used during encryption. 'item2' contains the ASN.1 encoded BLOB which contains the encrypyed value 'password-check\x02\x02' and the entry salt used for encryption.
-![Image](assets/img/browser-credentials/key4db.PNG)
+![Image](/assets/img/browser-credentials/key4db.PNG)
 
 I hacked together a class to repeatedly parse and store the ASN.1 encoded data used throughout the password extraction process. ASN.1 uses a [TLV (Type, Length, Value)](https://en.wikipedia.org/wiki/Type-length-value) data format and the data in question uses only a few of the DER data types which made things easier. The following snippet is the enum used in the parser class to check the DER data type of each TLV in an encoded BLOB - it shows which data types are used by Mozilla for password based encryption and the corresponding value of each 'Type' byte in a TLV sequence. 
 
@@ -418,18 +418,18 @@ foreach (FirefoxLoginsJSON.Login login in JSONLogins.Logins)
 ## And that's it!
 
 Here's the tool decrypting some bogus firefox logins as an example
-![Image](assets/img/browser-credentials/HBP_firefox_example.PNG)
+![Image](/assets/img/browser-credentials/HBP_firefox_example.PNG)
 
 Decryption using non-standard master password
-![Image](assets/img/browser-credentials/HBP_firefox_masterpassword_example.PNG)
+![Image](/assets/img/browser-credentials/HBP_firefox_masterpassword_example.PNG)
 
 # Other Examples
 
 Collecting Chrome and Firefox credentials and outputting both to the console
-![Image](assets/img/browser-credentials/HBP_all_example.PNG)
+![Image](/assets/img/browser-credentials/HBP_all_example.PNG)
 
 Writing output to CSV
-![Image](assets/img/browser-credentials/HBP_all_csv_example.PNG)
+![Image](/assets/img/browser-credentials/HBP_all_csv_example.PNG)
 
 # Interesting Forensic Note: 
 After testing I was wondering what interesting forensic artefacts might be created by using this tool. Obvious ones that came to mind were:
