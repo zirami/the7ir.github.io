@@ -1,8 +1,8 @@
-![Image](https://www.hackthebox.eu/badge/image/46633)          
-[My Other Stuff](https://apr4h.github.io)
-
 ---
-# **Decrypting Browser Credentials For Fun (But Not Profit)**    
+title: Decrypting Browser Credentials For Fun (But Not Profit)
+tags: [C#, 3DES, SQLite, DPAPI, Programming, Google Chrome, Mozilla Firefox, ASN.1]
+layout: post
+---       
 
 I was recently learning about web browser forensics and became interested in understanding the different ways that browsers locally store a user's credentials. I've also recently come across a few [HackTheBox](https://hackthebox.eu) machines requiring decryption of passwords from browsers for privilege escalation. This presented me with the idea for a relatively straightfoward task to start getting into C# .NET programming. What resulted was a pretty fun project that taught me a lot - and I figure it's worth documenting here. The following is my attempt to explain what I've learned and how my tool [HarvestBrowserPasswords.exe](https://github.com/Apr4h/HarvestBrowserPasswords) extracts and decrypts credentials locally stored by Google Chrome and Mozilla Firefox in Windows. Based on the research/work that's gone into building this tool, it would be pretty straightforward to add functionality for Internet Explorer/Edge credential decryption as well. Someday I might bother doing that, if it turns out anyone actually uses those browsers. 
 

@@ -1,8 +1,8 @@
-![Image](https://www.hackthebox.eu/badge/image/46633)          
-[My Other Stuff](https://apr4h.github.io)
-
 ---
-# **Hack The Box: Sniper**                                                                      
+title: Hack The Box: Sniper
+tags: [Webapp Exploit, nmap, gobuster, Local File Inclusion, Remote File Inclusion, Firewall Evasion, SSH tunneling, Privilege Escalation, WinRM, Client-Side attack]
+layout: post
+---
 
 ## Summary
 ![Image](./img/sniper_info.PNG)
