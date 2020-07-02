@@ -2,7 +2,6 @@
 title: Hack The Box - Sniper
 tags: [Webapp Exploit, nmap, gobuster, Local File Inclusion, Remote File Inclusion, Firewall Evasion, SSH tunneling, Privilege Escalation, WinRM, Client-Side attack, nishang]
 layout: post
-image: /assets/img/sniper/sniper_info.PNG
 ---
 
 Sniper was a pretty fun machine that put an interesting spin on a couple of older attack techniques. Unlike some other machines that I've come across lately,
