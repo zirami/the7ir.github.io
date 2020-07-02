@@ -4,7 +4,7 @@ tags: [HTB, webapp exploit, nmap, smb, LUKS, ysoserial, java deserialisation exp
 layout: post
 ---                                                                  
 
-Arkham was definitely more difficult than its rating made it seem. In particular, the java deserialisation exploit required a fair bit of research and testing. The combination of UAC bypass / DLL hijack was a nice touch for the privesc. I refer to this post every now-and-then when I need to copy/paste code for writing/compiling a simple DLL :)
+Arkham was definitely more difficult than its rating would have you believe! In particular, the java deserialisation exploit required a fair bit of research and testing. The combination of UAC bypass / DLL hijack was a nice touch for the privesc. I refer to this post every now-and-then when I need to copy/paste code for writing/compiling a simple DLL :)
 
 ## Summary
 - SMB - Mounting shares
