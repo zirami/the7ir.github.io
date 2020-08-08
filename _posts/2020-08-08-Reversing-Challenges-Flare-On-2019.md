@@ -46,3 +46,5 @@ There are plenty of ways to transform this back into the plaintext weapon code. 
 
 Plugging that in gives me the flag `Kitteh_save_galixy@flare-on.com` :)
 ![Image](/assets/img/flare-on-2019/lvl_1_flag.PNG)
+
+## Level 2: Overlong
