@@ -27,19 +27,19 @@ A quick check with CFF explorer shows that we're definitely working with a 32bit
 
 A .NET assembly has been compiled to managed code - specifically, Microsoft Intermediate Language (MSIL). It is then Just-In-Time (JIT)-compiled into machine code by the CLR when executed. MSIL can be easily decompiled to something that looks very close to the assembly's original source code. 
 
-Here's what the application looks like when run. 
+Here's what the application looks like when it runs. 
 ![Image](/assets/img/flare-on-2019/lvl_1_first_run.PNG)
 
 I can quickly determine a couple of things by seeing what happens when it runs.
-	1. I need to find a 'Weapon Arming Code'
-	2. There are probably multiple 'Stages' that will need to be cleared to get the flag
-	3. The challenge creator's memes are dank
+1. I need to find a 'Weapon Arming Code'
+2. There are probably multiple 'Stages' that will need to be cleared to get the flag
+3. The challenge creator's memes are dank
 
 The tool [dnspy](https://github.com/0xd4d/dnSpy) allows for reverse engineering .NET assemblies, including debugging and decompiling them - and is already installed in FLARE VM. Dnspy shows that there are 3 WinForms in the assembly that I care about: 'Stage1Form', 'Stage2Form' and 'VictoryForm'. Stage1Form has a function called `FireButton_Click()` that checks the string typed by the user against  the string "RAINBOW". So that one was easy enough...
 ![Image](/assets/img/flare-on-2019/lvl_1_dnspy_stage_1.PNG)
 
 Typing the correct weapon code gives me a cool cat rainbow lazer animation then executes the Stage2Form, which prompts for another weapon arming code. The relevant code for stage 2 is below. Once a weapon code is provided, each character of the code is XORd with 0x41 ('A') and compared to the char[] array declared at the bottom of the `isValidWeaponCode()` function. If this function resolves true, the victory animation timer is started and I should be given the flag...
-![Image](/assets/img/flare-on-2019/lvl_1_dnspy_stage_1.PNG)
+![Image](/assets/img/flare-on-2019/lvl_1_dnspy_stage_2.PNG)
 
 There are plenty of ways to transform this back into the plaintext weapon code. I chose to use CyberChef to escape the unicode characters (`\u00xx`) and perform the XOR function. Here's the result...
 ![Image](/assets/img/flare-on-2019/lvl_1_cyberchef_decode.PNG)
