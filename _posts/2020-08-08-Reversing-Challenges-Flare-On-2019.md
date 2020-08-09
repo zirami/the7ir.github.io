@@ -1,6 +1,6 @@
 ---
 title: Reversing CTF - Flare-On 2019 Challenegs
-tags: [Reversing, dnspy, .NET, Android, DNS, CTF]
+tags: [Reversing, dnspy, .NET, Android, DNS, CTF, x64dbg, IDA]
 layout: post
 ---
 
