@@ -65,7 +65,7 @@ From here, I found both static and dynamic analysis useful. For debugging Window
 ![Image](/assets/img/flare-on-2019/lvl_2_ida_start.PNG)
 
 Now I know that whatever 'encoding' might be occurring must be happening in the function "sub_401160" so next, I check out what it does. To summarise - the function loops x times, where x is the 3rd argument passed to the function. By default this is the constant 0x1c. For each iteration of the loop, it performs some kind of encoding (I didn't bother fully trying to understand because in this case, I didn't need to) on a byte from the data passed in as argument 2 before writing that 'decoded' byte to the next spot in the buffer passed by address as the 3rd argument. 
-![Image](/assets/img/flare-on-2019/lvl_2_ida_decode.PNG)
+![Image](/assets/img/flare-on-2019/lvl_2_ida_decode.png)
 
 The number 0x1c (28 decimal) = the length of "I never broke the encoding: " with a trailing space. So, it seems like the function is only decoding the first 28 bytes of data and the flag should be in the remainder of the data! I can easily test this in a debugger by increasing that value 0x1C to see if the function decodes more bytes... Here's what that looks like in x32dbg:
 ![Image](/assets/img/flare-on-2019/lvl_2_x32dbg_edit.PNG)
