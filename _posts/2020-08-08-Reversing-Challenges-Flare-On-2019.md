@@ -128,18 +128,18 @@ public final boolean isEcstatic() {
 ```
 
 The functions `feed()`, `play()` and `clean()` affect the Tamachochi's "mass", "happy" and "clean" values.
-	- feed()
-		- mass + 10
-		- happy + 2
-		- clean - 1
-	- play()
-		- mass - 2
-		- happy + 4
-		- clean - 1
-	- clean()
-		- mass + 0
-		- happy - 1
-		- clean + 6
+  - feed()
+    - mass + 10
+    - happy + 2
+    - clean - 1
+  - play()
+    - mass - 2
+    - happy + 4
+    - clean - 1
+  - clean()
+    - mass + 0
+    - happy - 1
+    - clean + 6
 		
 The following sequence of activities should therefore make `isEcstatic()` return true:
 1. feed 8 times
