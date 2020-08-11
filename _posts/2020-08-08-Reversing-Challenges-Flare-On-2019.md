@@ -73,6 +73,108 @@ The number 0x1c (28 decimal) = the length of "I never broke the encoding: " with
 Now if I run the program, it loops enough times to decode the rest of the flag!
 ![Image](/assets/img/flare-on-2019/lvl_2_x32dbg_flag.PNG)
 
+## Level 3: Flarebear
+
+Level 3 is an APK accompanied by this message:
+```
+We at Flare have created our own Tamagotchi pet, the flarebear. He is very fussy. Keep him alive and happy and he will give you the flag.
+```
+
+I used the bluestacks emulator to run the APK. The app lets you create your own bear which you can feed, play with, and clean when he poos.
+![Image](/assets/img/flare-on-2019/lvl_3_flarebear.PNG)
+
+A quick peek at the APK's contents with 7zip shows that this Tamagochi app was written in Kotlin rather than Java based on the directory structure and filenames.
+![Image](/assets/img/flare-on-2019/lvl_3_7zip.PNG)
+
+Thankfully, I can convert the APK to a Java archive for easier static analysis using [d2j-dex2jar](https://github.com/pxb1988/dex2jar).
+![Image](/assets/img/flare-on-2019/lvl_3_dex2jar.PNG)
+
+Now I can examine the app's code using a Java decompiler. The main class I care about is `FlareBearActivity.class` - based on some digging and ctrl+f for the word 'flag'
+![Image](/assets/img/flare-on-2019/lvl_3_java_decompiled.PNG)
+
+If I can get the `danceWithFlag()` function to run, I should get the flag for this level. From here I can work through the code backwards...
+
+`setMood()` calls `danceWtihFlag()` if `isEcstatic()` returns true.
+```java
+public final void setMood() {
+	if (isHappy()) {
+	  ((ImageView)_$_findCachedViewById(R.id.flareBearImageView)).setTag("happy");
+	  if (isEcstatic())
+		danceWithFlag(); 
+	} else {
+	  ((ImageView)_$_findCachedViewById(R.id.flareBearImageView)).setTag("sad");
+	} 
+}
+```
+
+`isEcstatic()` returns true if the Tamagochi's "mass" is 72, "happy" is 30 and "clean" is 0.
+```java  
+public final boolean isEcstatic() {
+	boolean bool1 = false;
+	int i = getState("mass", 0);
+	int j = getState("happy", 0);
+	int k = getState("clean", 0);
+	boolean bool2 = bool1;
+	if (i == 72) {
+	  bool2 = bool1;
+	  if (j == 30) {
+		bool2 = bool1;
+		if (k == 0)
+		  bool2 = true; 
+	  } 
+	} 
+	return bool2;
+}
+```
+
+The functions `feed()`, `play()` and `clean()` affect the Tamachochi's "mass", "happy" and "clean" values.
+	- feed()
+		- mass + 10
+		- happy + 2
+		- clean - 1
+	- play()
+		- mass - 2
+		- happy + 4
+		- clean - 1
+	- clean()
+		- mass + 0
+		- happy - 1
+		- clean + 6
+		
+The following sequence of activities should therefore make `isEcstatic()` return true:
+1. feed 8 times
+2. play 4 times
+3. clean 2 times
+
+And I get the flag! `th4t_was_be4rly_a_chall3nge@flare-on.com`
+![Image](/assets/img/flare-on-2019/lvl_3_flag.PNG)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
