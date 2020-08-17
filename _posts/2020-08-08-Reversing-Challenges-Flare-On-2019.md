@@ -57,7 +57,7 @@ The secret of this next challenge is cleverly hidden. However, with the right ap
 Running the binary only gives me a small "Output" window suggesting that some 'encoding' occurs.
 ![Image](/assets/img/flare-on-2019/lvl_2_first_run.PNG)
 
-From here, I found both static and dynamic analysis useful. For debugging Windows PE files, I normally use x32/x64dbg and my go-to for disassembly is IDA. First, opening the file in IDA and viewing the entry function shows that two functions being called. The second function is a call to MessageBoxA which is where our 'Output' window is being created. The first one takes three arguments:
+From here, I found both static and dynamic analysis useful. For debugging Windows Portable Executables, I normally use x32/x64dbg and IDA or Ghidra for disassembly. First, opening the file in IDA and viewing the entry function shows that two functions being called. The second function is a call to MessageBoxA which is where our 'Output' window is being created. The first one takes three arguments:
   1. A memory address to an empty local buffer
   2. "offset unk_402008" (Blob of seemingly encoded data from offset 0x402008 in .rdata)
   3. The value 0x1c      
@@ -149,7 +149,16 @@ The following sequence of activities should therefore make `isEcstatic()` return
 And I get the flag! `th4t_was_be4rly_a_chall3nge@flare-on.com`
 ![Image](/assets/img/flare-on-2019/lvl_3_flag.PNG)
 
+## Level 4: Dnschess
 
+This time, we're given 2 binaries:
+- ChessUI (a 64 bit ELF)
+- ChessAI.so (a 64 bit ELF shared library)
+
+And of course, Message.txt containing the clue for this level:
+```
+Some suspicious network traffic led us to this unauthorized chess program running on an Ubuntu desktop. This appears to be the work of cyberspace computer hackers. You'll need to make the right moves to solve this one. Good luck!
+```
 
 
 
