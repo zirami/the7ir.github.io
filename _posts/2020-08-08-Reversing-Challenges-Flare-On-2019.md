@@ -151,22 +151,39 @@ And I get the flag! `th4t_was_be4rly_a_chall3nge@flare-on.com`
 
 ## Level 4: Dnschess
 
-This time, we're given 2 binaries:
+This time, we're given 3 files:
 - ChessUI (a 64 bit ELF)
 - ChessAI.so (a 64 bit ELF shared library)
+- a pcap
 
 And of course, Message.txt containing the clue for this level:
 ```
 Some suspicious network traffic led us to this unauthorized chess program running on an Ubuntu desktop. This appears to be the work of cyberspace computer hackers. You'll need to make the right moves to solve this one. Good luck!
 ```
 
+I used FLARE VM to statically analyse these binaries, but also used a Kali Linux VM that I had on-hand for dynamic analysis.
 
+By looking at the disassembly, I can see that ChessUI loads the shared library ChessAI.so and then starts calling exported functions from it, including `GetAiName()`, `GetAiGreeting()` and most interestingly `GetNextMove()`. 
+![Image](/assets/img/flare-on-2019/lvl_4_ida_dlload.PNG)
 
+I can also make an educated guess that ChessUI is generating a chess board user interface based on the references to GTK, embedded SVGs with namers of chess pieces in the binary's strings.
+![Image](/assets/img/flare-on-2019/lvl_4_strings.PNG)
 
+Inspecting the pcap shows a series of DNS requests and responses. The domain in each request takes the form of a '-' delimeted chess move prepended to `.game-of-thrones.flare-on.com`. Each response is an A record whose first octet is '127'.
+![Image](/assets/img/flare-on-2019/lvl_4_wireshark.PNG)
 
+Next, I executed ChessUI. A chess board UI is generated and the DEEPFLARE AI asks me to make a chess move. If I move a piece, the AI instantly resigns.
+![Image](/assets/img/flare-on-2019/lvl_4_gameboard_gameover.PNG)
 
+I started capturing network traffic with Wireshark while running ChessUI. A DNS request is made corresponding to the chess move I made. The 'No such name' DNS response captured in wireshark probably has something to do with the AI resigning straight away.
+![Image](/assets/img/flare-on-2019/lvl_4_wireshark_dns_fail.PNG)
 
+Next I decided to look at ChessAI.so to get a better idea of what's happening when I make a move on the chess board. `GetNExtMove()` seemed to be where the DNS request is being made. Ghidra's decomiler made understanding this function much easier. 
+![Image](/assets/img/flare-on-2019/lvl_4_ghidra_getnextmove.PNG)
 
+Firstly, this function builds the domain string from my chess move and makes the DNS request. Second, it contains the logic to determine whether move was a valid one - based on `param_1` and IPv4 address returned in the DNS response.
+
+The 'if' statement below needs to resolve to False
 
 
 
