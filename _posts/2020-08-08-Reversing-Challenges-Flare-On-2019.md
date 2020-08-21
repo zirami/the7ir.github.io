@@ -183,10 +183,83 @@ Next I decided to look at ChessAI.so to get a better idea of what's happening wh
 
 Firstly, this function builds the domain string from my chess move and makes the DNS request. Second, it contains the logic to determine whether move was a valid one - based on `param_1` and IPv4 address returned in the DNS response.
 
-The 'if' statement below needs to resolve to False
+The 'if' statement below needs to resolve to False for a given move to be valid:
+```
+  if ((((phVar2 == (hostent *)0x0) || (pcVar1 = *phVar2->h_addr_list, *pcVar1 != '\x7f')) ||
+      ((pcVar1[3] & 1U) != 0)) || (param_1 != ((uint)(byte)pcVar1[2] & 0xf))) {
+    uVar3 = 2;
+  }
+```
 
+To break this down, the following expressions all need to evaluate to True
+1. `(phVar2 == (hostent *)0x0)` the DNS request must have successfully resolved
+2. `(pcVar1 = *phVar2->h_addr_list, *pcVar1 != '\x7f')` The first octet of the IP address must be '127' (\x7f)
+3. `(pcVar1[3] & 1U) != 0))` The last bit of the fourth octet of the IP address must be 0
+4. `(param_1 != ((uint)(byte)pcVar1[2] & 0xf))` The last four bits of the third octet must equal `param_1`, which is equal to the number of turns taken by the player.
 
+Next, I extracted each move and its corresponding ip address from the pcap with tshark into a text file and cleaned up the output. I added these lines into `/etc/hosts` so that they would resolve properly.
 
+```
+127.150.96.223	rook-c3-c6.game-of-thrones.flare-on.com
+127.252.212.90	knight-g1-f3.game-of-thrones.flare-on.com
+127.215.177.38	pawn-c2-c4.game-of-thrones.flare-on.com
+127.118.118.207	knight-c7-d5.game-of-thrones.flare-on.com
+127.89.38.84	bishop-f1-e2.game-of-thrones.flare-on.com
+127.109.155.97	rook-a1-g1.game-of-thrones.flare-on.com
+127.217.37.102	bishop-c1-f4.game-of-thrones.flare-on.com
+127.49.59.14	bishop-c6-a8.game-of-thrones.flare-on.com
+127.182.147.24	pawn-e2-e4.game-of-thrones.flare-on.com
+127.0.143.11	king-g1-h1.game-of-thrones.flare-on.com
+127.227.42.139	knight-g1-h3.game-of-thrones.flare-on.com
+127.101.64.243	king-e5-f5.game-of-thrones.flare-on.com
+127.201.85.103	queen-d1-f3.game-of-thrones.flare-on.com
+127.200.76.108	pawn-e5-e6.game-of-thrones.flare-on.com
+127.50.67.23	king-c4-b3.game-of-thrones.flare-on.com
+127.157.96.119	king-c1-b1.game-of-thrones.flare-on.com
+127.99.253.122	queen-d1-h5.game-of-thrones.flare-on.com
+127.25.74.92	bishop-f3-c6.game-of-thrones.flare-on.com
+127.168.171.31	knight-d2-c4.game-of-thrones.flare-on.com
+127.148.37.223	pawn-c6-c7.game-of-thrones.flare-on.com
+127.108.24.10	bishop-f4-g3.game-of-thrones.flare-on.com
+127.37.251.13	rook-d3-e3.game-of-thrones.flare-on.com
+127.34.217.88	pawn-e4-e5.game-of-thrones.flare-on.com
+127.57.238.51	queen-a8-g2.game-of-thrones.flare-on.com
+127.196.103.147	queen-a3-b4.game-of-thrones.flare-on.com
+127.141.14.174	queen-h5-f7.game-of-thrones.flare-on.com
+127.238.7.163	pawn-h4-h5.game-of-thrones.flare-on.com
+127.230.231.104	bishop-e2-f3.game-of-thrones.flare-on.com
+127.55.220.79	pawn-g2-g3.game-of-thrones.flare-on.com
+127.184.171.45	knight-h8-g6.game-of-thrones.flare-on.com
+127.196.146.199	bishop-b3-f7.game-of-thrones.flare-on.com
+127.191.78.251	queen-d1-d6.game-of-thrones.flare-on.com
+127.159.162.42	knight-b1-c3.game-of-thrones.flare-on.com
+127.184.48.79	bishop-f1-d3.game-of-thrones.flare-on.com
+127.127.29.123	rook-b4-h4.game-of-thrones.flare-on.com
+127.191.34.35	bishop-c1-a3.game-of-thrones.flare-on.com
+127.5.22.189	bishop-e8-b5.game-of-thrones.flare-on.com
+127.233.141.55	rook-f2-f3.game-of-thrones.flare-on.com
+127.55.250.81	pawn-a2-a4.game-of-thrones.flare-on.com
+127.53.176.56	pawn-d2-d4.game-of-thrones.flare-on.com
+``` 
+
+With a few lines of python I was able to determine which of the moves above are valid based on their IP address and work out the order in which each valid move should be played. The move order can be worked out with a mod 16 operation, because `param_1` (the turn number) must equal the IP address's 3rd octet AND-ed with \xf each time a move is made.
+
+```python
+#!/usr/bin/env python3
+
+with open("dns.txt") as f:
+    moves = f.readlines()
+    for move in moves:
+        octets = move.split(".")
+        if int(octets[3].split('\t')[0]) & 1 == 0:
+            print(f"{int(octets[2]) % 16}\t{move}")
+```
+
+With some help from bash, I get a clean outputted sequence of moves...
+![Image](/assets/img/flare-on-2019/lvl_4_bash_python_script.PNG)
+
+Playing these moves in order puts the AI in checkmate and prints the flag :)
+![Image](/assets/img/flare-on-2019/lvl_4_flag.PNG)
 
 
 
