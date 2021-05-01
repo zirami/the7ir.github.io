@@ -42,6 +42,7 @@ social-network-links:
   email: "apr4h.ctf@gmail.com"
   github: Apr4h
   rss: true
+  twitter: _Apr4h
 #  reddit: yourname
 #  linkedin: daattali
 #  xing: yourname
@@ -81,8 +82,8 @@ excerpt_length: 50
 
 # Personalize the colors in your website. Colour values can be any valid CSS colour
 
-navbar-col: "#f4a261"
-navbar-text-col: "#2a9d8f"
+navbar-col: "#68686b"
+navbar-text-col: "#ffffff"
 navbar-border-col: "#2d3142"
 page-col: "#ffffff"
 link-col: "#0077b6"
