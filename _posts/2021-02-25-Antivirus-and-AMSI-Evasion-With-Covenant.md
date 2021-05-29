@@ -1,6 +1,6 @@
 ---
 title: Antivirus and AMSI Evasion with Covenant 
-tags: [C2, av-evasion, AMSI, .NET, lateral-movement, HTB]
+tags: [C2, av-evasion, AMSI, .NET, Covenant]
 layout: post
 ---
 
@@ -94,7 +94,7 @@ From there, the executing stager assembly should begin establishing an encrypted
 
 Before I start dropping this XML payload all over boxes in the lab, I want to know if I'm going to get schwacked by defender. 
 
-This awesome tool [DefenderCheck](https://github.com/matterpreter/DefenderCheck) by [matterpreter](https://twitter.com/matterpreter) helps to quickly identify exactly which bytes in a file are being detected by Windows Defenderm, and even tells you exactly which signature is being detected!
+This awesome tool [DefenderCheck](https://github.com/matterpreter/DefenderCheck) by [matterpreter](https://twitter.com/matterpreter) helps to quickly identify exactly which bytes in a file are being detected by Windows Defender, and even tells you exactly which signature is being detected!
 
 I generated an MSBuild payload and ran DefenderCheck against it to identify exactly what was being detected. Unsurprisingly, the C# section of the file which loads and the decoded/decompressed payload is being detected.  
 
