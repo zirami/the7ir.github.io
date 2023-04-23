@@ -11,7 +11,9 @@ Some Description
     - Nmap Scanning
 - Exploit CVE for Vulnerable Version
 - Privilege Escalation
+
 ---
+
 ## Information Gathering Stage
 ### Nmap Scanning 
 `sudo nmap -sV 10.10.11.189 -p-`
